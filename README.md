@@ -24,3 +24,8 @@
 ## 📫 找到我 / Connect with Me
 - **Email**: 15089545771@163.com
 - **Status**: 💡 开放寻找【数字化转型 / AI自动化落地 / 跨境运营分析】相关机会，欢迎出海团队/独立开发者勾搭！
+- # 🚧 Project Status: Active MVP (Minimum Viable Product)
+
+> **[CN] 核心提示**：本项目目前处于活跃的 MVP（最小可行性产品）阶段。核心商业闭环已全部跑通，目前正在持续优化边界异常控制与高并发容错。欢迎开 Issue 提意见或探讨定制化部署！
+>
+> **[EN] Notice**: This project is currently in an active MVP stage. The core commercial closed-loop has been fully validated and executed. Current developments are focused on refining edge-case exception handling and high-concurrency fault tolerance. Discussions regarding customized enterprise deployment are highly welcome!
