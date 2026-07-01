@@ -1,31 +1,23 @@
-# 🚀 Global Traffic Growth & AI Marketing Toolkit | 海外流量增长与自动化营销系统
+🗺️ 系统架构与故事线 / Architecture & Workflow
+本系统采用**【数据层 ➡️ 策略层 ➡️ 执行层】**的增长黑客全链路闭环设计：
 
-*(请在这里粘贴通用的 Project Status 模块)*
+📊 1. 数据层 | Data Layer (海外多源流量监控 / Multi-Source Traffic Tracker)
+- [CN] 融合多源异构数据。通过 Python 自动化脚本监控海外红人（KOL ROI）、追踪全球独立站电商趋势（Shopify Trends 2026），并动态抓取海外主流社区（Reddit）的社媒舆情与潜在意向，解决**“去哪里找精准流量与实时线索”**的痛点。
+- [EN] Integrates multi-source heterogeneous data. Utilizes Python scripts to track Overseas KOL ROI, analyze global e-commerce trends (Shopify Trends 2026), and monitor social sentiment on mainstream communities (Reddit) to solve the core pain point of "where to pinpoint high-value traffic and real-time leads."
 
-### 💡 商业价值 / Business Value
-- **[CN]** 针对跨境出海与 B2B 营销场景，将“公域红人数据清洗”与“AI 自动化触达”深度融合。用机器终结每日 2 小时的人工表格内耗，实现零人工干预的海外线索精准挖掘与个性化开发信自动化闭环。
-- **[EN]** Tailored for cross-border e-commerce and global B2B marketing. This toolkit seamlessly integrates public KOL data engineering with AI-driven outbound workflows, eliminating hours of manual spreadsheet grinding and enabling fully automated, hyper-personalized global lead generation.
+🎯 2. 策略层 | Strategy Layer (用户增长与留存模型 / Growth & Retention Modeling)
+- [CN] 基于清洗后的干净数据，嵌入在线零售商用户增长与留存策略分析模型。针对海外用户进行存量画像描绘与流失预警，用数据推演指导触达优先级，确保营销预算每一分都花在刀刃上。
+- [EN] Embeds user growth and retention analysis models based on cleaned data. Profiles overseas users and predicts churn risks to guide outreach prioritization, ensuring every penny of the marketing budget delivers maximum ROI.
 
----
+🤖 3. 执行层 | Execution Layer (多渠道全自动触达智能体 / Multi-Channel Automated Agent)
+- [CN] 无缝对接 Dify 工作流引擎、Hunter.io API 与领英自动化触达协议（Linken Global Outreach）。大模型严格控制 JSON 结构化输出，不仅能批量全自动生成地道的个性化中英双语开发信，还能自动推进多渠道公域引流与私域转化，解决**“怎么低成本高效规模化转化”**的痛点。
+- [EN] Seamlessly connects Dify workflow engine with Hunter.io API and LinkedIn outreach protocols (Linken Global Outreach). Controls LLM structured outputs to batch-generate hyper-personalized contextual outbound messages and automate multi-channel funnel conversion to solve the puzzle of "how to convert at scale with minimum cost."
 
-### 🗺️ 系统架构与故事线 / Architecture & Workflow
-本系统采用**【数据层 ➡️ 执行层】**的增长黑客全链路闭环设计：
+🛠️ 技术栈 / Tech Stack
+- Data & Dev: Python (Pandas) / API Integration (Hunter.io, LinkedIn API)
+- AI Automation: Dify Workflow / Prompt Engineering / JSON Structured Control
+- Frontend / Data Visual: Streamlit / HTML5 Interactive Dashboard (Shopify & KOL Tracker)
 
-1. **📊 数据层 | Data Layer (海外红人监控看板 / Overseas KOL Tracker)**
-   - **[CN]** 使用 Python 自动化脚本抓取并清洗海外 KOL 多源异构原始数据，排除异常干扰项，搭建动态监控看板，解决**“去哪里找精准流量/线索”**的痛点。
-   - **[EN]** Utilizes Python scripts to scrape, clean, and harmonize heterogeneous multi-source KOL data. Eliminates noise and outputs a dynamic tracking dashboard, solving the core pain point of *"where to pinpoint high-value traffic."*
-2. **🤖 执行层 | Execution Layer (自动获客与触达智能体 / Automated Lead Gen Agent)**
-   - **[CN]** 无缝对接 Dify 工作流引擎与 Hunter.io API，大模型严格控制结构化输出（Structured Output），将非结构化商户反馈自动归类，并批量自动生成地道的个性化中英双语商务触达信，解决**“怎么低成本高效转化”**的痛点。
-   - **[EN]** Seamlessly connects Dify workflow engine with Hunter.io API. Controls LLM structured outputs to automatically categorize unstructured buyer feedback, batch-generating hyper-personalized, contextual business outbound emails to solve the puzzle of *"how to convert at scale with minimum cost."*
-
----
-
-### 🛠️ 技术栈 / Tech Stack
-- **Data & Dev**: Python (Pandas) / API Integration (Hunter.io)
-- **AI Automation**: Dify Workflow / Prompt Engineering / JSON Structured Control
-- **Frontend / UI**: Streamlit Interactive Dashboard
-- # 🚧 Project Status: Active MVP (Minimum Viable Product)
-
-> **[CN] 核心提示**：本项目目前处于活跃的 MVP（最小可行性产品）阶段。核心商业闭环已全部跑通，目前正在持续优化边界异常控制与高并发容错。欢迎开 Issue 提意见或探讨定制化部署！
->
-> **[EN] Notice**: This project is currently in an active MVP stage. The core commercial closed-loop has been fully validated and executed. Current developments are focused on refining edge-case exception handling and high-concurrency fault tolerance. Discussions regarding customized enterprise deployment are highly welcome!
+🚧 Project Status: Active MVP (Minimum Viable Product)
+[CN] 核心提示：本项目目前处于活跃的 MVP 阶段。全链路商业闭环已全部跑通，目前正在持续优化边界异常控制与高并发容错。欢迎开 Issue 提意见或探讨定制化部署！
+[EN] Notice: This project is currently in an active MVP stage. The core commercial closed-loop has been fully validated. Current developments are focused on refining edge-case exception handling and high-concurrency fault tolerance.
