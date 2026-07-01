@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOLROI Dashboard — Local & Secure</title>
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-main: #0D0F16;
+      --bg-card: #151922;
+      --border: rgba(255, 255, 255, 0.06);
+      --text-main: #E2E8F0;
+      --text-muted: #8B93A7;
+      --muted2: #5A6173;
+      --accent: #00FFB2;
+      --blue: #5B9CF6;
+      --amber: #FFB547;
+      --red: #FF5C5C;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 40px;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 15, 22, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 1px;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .meta-status {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-nav:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--text-muted);
+    }
+
+    /* SCREEN 1: UPLOAD */
+    .upload-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .welcome-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .welcome-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #FFF;
+    }
+
+    .welcome-header p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+
+    .dropzone {
+      border: 2px dashed rgba(255, 255, 255, 0.12);
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+    }
+
+    .dropzone:hover {
+      border-color: var(--blue);
+      background: rgba(91, 156, 246, 0.02);
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(0, 255, 178, 0.04);
+    }
+
+    .dropzone.done {
+      border-style: solid;
+      border-color: var(--accent);
+      background: rgba(0, 255, 178, 0.01);
+    }
+
+    .dropzone input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .dz-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .dz-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #FFF;
+    }
+
+    .dz-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .dz-status {
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      display: none;
+    }
+
+    .dropzone.done .dz-status {
+      display: block;
+    }
+
+    .dropzone.done .dz-desc,
+    .dropzone.done .dz-title,
+    .dropzone.done .dz-icon {
+      opacity: 0.3;
+    }
+
+    .config-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+
+    .config-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #FFF;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group select,
+    .form-group input {
+      background: #0D0F16;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+      border-color: var(--blue);
+    }
+
+    .actions-row {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .btn-main {
+      flex: 2;
+      background: var(--accent);
+      color: #0D0F16;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-main:hover {
+      opacity: 0.9;
+    }
+
+    .btn-main:disabled {
+      background: var(--muted2);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    .btn-sec {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-sec:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* SCREEN 2: DASHBOARD */
+    .dashboard-screen {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px;
+      display: none;
+    }
+
+    /* Timezone Banner Alert */
+    .alert-banner {
+      background: rgba(255, 181, 71, 0.06);
+      border: 1px solid rgba(255, 181, 71, 0.2);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .alert-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .alert-text {
+      font-size: 13.5px;
+      color: #FFE3BA;
+      line-height: 1.5;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--border);
+    }
+
+    .kpi-card.c-rev::before {
+      background: var(--accent);
+    }
+
+    .kpi-card.c-ord::before {
+      background: var(--blue);
+    }
+
+    .kpi-card.c-spend::before {
+      background: var(--purple);
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-val {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #FFF;
+      margin-bottom: 4px;
+    }
+
+    .kpi-s {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .kpi-s.up {
+      color: var(--accent);
+    }
+
+    .kpi-s.down {
+      color: var(--red);
+    }
+
+    .kpi-s.warn {
+      color: var(--amber);
+    }
+
+    /* Dashboard Layout Blocks */
+    .dash-row-1 {
+      display: grid;
+      grid-template-columns: 2.2fr 1.1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .dash-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #FFF;
+    }
+
+    /* Charts Layout */
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 240px;
+    }
+
+    /* Tables UI */
+    .table-wrapper {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      display: inline-block;
+    }
+
+    .b-b {
+      background: rgba(91, 156, 246, 0.1);
+      color: var(--blue);
+    }
+
+    .b-g {
+      background: rgba(0, 255, 178, 0.1);
+      color: var(--accent);
+    }
+
+    .b-r {
+      background: rgba(255, 92, 92, 0.1);
+      color: var(--red);
+    }
+
+    .b-a {
+      background: rgba(255, 181, 71, 0.1);
+      color: var(--amber);
+    }
+
+    .b-n {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    /* ROAS Progress Bar inside Table */
+    .rb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-width: 100px;
+    }
+
+    .rb-track {
+      background: rgba(255, 255, 255, 0.05);
+      height: 6px;
+      border-radius: 3px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .rb-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* Special Table styles for TZ Comparison */
+    .tz-table th {
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .tz-table td {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+
+    .tz-diff {
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    /* Filters row for Full Orders List */
+    .filters-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .mini-select {
+      background: #0D0F16;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #FFF;
+      color: #0D0F16;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .empty {
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo">KOL<span>ROI</span></div>
+    <div class="meta-status" id="dash-meta" style="display:none;">
+      <span><span class="dot"></span> Analyzed locally</span>
+      <span id="meta-orders">0 orders</span>
+      <span class="chip" id="meta-range">—</span>
+    </div>
+    <div id="nav-action-zone" style="display:none;">
+      <button class="btn-nav" onclick="resetToUpload()">← Upload again</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: UPLOAD SCREEN -->
+  <div class="upload-screen" id="screen-upload">
+    <div class="welcome-header">
+      <h1>KOL Attribution & Timezone Audit</h1>
+      <p>Drop your Shopify standard export data and Creator parameters. All processes run 100% inside your local
+        browser.</p>
+    </div>
+
+    <div class="upload-grid">
+      <div class="dropzone" id="drop-orders" ondragover="handleDrag(event, 'drop-orders')"
+        ondragleave="handleLeave('drop-orders')" ondrop="handleDrop(event, 'orders')">
+        <input type="file" accept=".csv" onchange="handleFile(event, 'orders')">
+        <div class="dz-icon">🛍️</div>
+        <div class="dz-title">Shopify Orders CSV</div>
+        <div class="dz-desc">Exported raw file from Shopify Admin Orders panel.<br>Must include Name, Created at, and
+          Discount Code.</div>
+        <div class="dz-status" id="orders-status">✓ Loaded</div>
+      </div>
+
+      <div class="dropzone" id="drop-roster" ondragover="handleDrag(event, 'drop-roster')"
+        ondragleave="handleLeave('drop-roster')" ondrop="handleDrop(event, 'roster')">
+        <input type="file" accept=".csv" onchange="handleFile(event, 'roster')">
+        <div class="dz-icon">📋</div>
+        <div class="dz-title">Creator Roster CSV</div>
+        <div class="dz-desc">A simple sheet containing columns:<br><strong>Creator</strong>, <strong>Code</strong>, and
+          <strong>Flat_Fee</strong>.
+        </div>
+        <div class="dz-status" id="roster-status">✓ Loaded</div>
+      </div>
+    </div>
+
+    <div class="config-card">
+      <div class="config-title">Analysis Settings & Timezone Offsets</div>
+      <div class="config-grid">
+        <div class="form-group">
+          <label>Creator Post Timezone</label>
+          <select id="tz-kol">
+            <option value="-8">UTC-8 Los Angeles (PST)</option>
+            <option value="-5">UTC-5 New York (EST)</option>
+            <option value="0">UTC+0 London (GMT)</option>
+            <option value="1">UTC+1 Paris (CET)</option>
+            <option value="8" selected>UTC+8 Singapore / Beijing (SGT)</option>
+            <option value="9">UTC+9 Tokyo (JST)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Shopify Admin Timezone</label>
+          <select id="tz-store">
+            <option value="-8">UTC-8 Los Angeles (PST)</option>
+            <option value="-5">UTC-5 New York (EST)</option>
+            <option value="0">UTC+0 London</option>
+            <option value="8" selected>UTC+8 Singapore (SGT)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Max Conversion Window</label>
+          <select id="attr-window">
+            <option value="24">24 Hours</option>
+            <option value="48" selected>48 Hours (Standard)</option>
+            <option value="72">72 Hours</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn-sec" onclick="loadDemoData()">⚡ Load Demo Data</button>
+      <button class="btn-main" id="btn-go" disabled onclick="runAnalysis()">Run Attribution Analysis →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: DASHBOARD SCREEN -->
+  <div class="dashboard-screen" id="screen-dash">
+
+    <!-- Timezone Banner Warning (Hidden by default) -->
+    <div class="alert-banner" id="tz-alert" style="display:none;">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-text" id="tz-alert-msg">Timezone mismatch warning msg template.</div>
+    </div>
+
+    <!-- Top KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card c-rev">
+        <div class="kpi-label">Attributed Revenue</div>
+        <div class="kpi-val" id="k-rev">$0</div>
+        <div class="kpi-s" id="k-rev-s">0% of total revenue</div>
+      </div>
+      <div class="kpi-card c-ord">
+        <div class="kpi-label">Attributed Orders</div>
+        <div class="kpi-val" id="k-ord">0</div>
+        <div class="kpi-s" id="k-ord-s">0 organic orders</div>
+      </div>
+      <div class="kpi-card c-spend">
+        <div class="kpi-label">Total Spend (Flat Fees)</div>
+        <div class="kpi-val" id="k-spend">$0</div>
+        <div class="kpi-s" id="k-spend-s">0 creators</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Blended ROAS</div>
+        <div class="kpi-val" id="k-roas">0.00x</div>
+        <div class="kpi-s" id="k-roas-s">🔴 Needs work</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total ROI</div>
+        <div class="kpi-val" id="k-roi">0%</div>
+        <div class="kpi-s" id="k-roi-s">Unprofitable</div>
+      </div>
+    </div>
+
+    <!-- Row 1: Creator Table & Revenue Share Pie -->
+    <div class="dash-row-1">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Creator Attribution Breakdown</div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Creator</th>
+                <th>Code</th>
+                <th>Revenue</th>
+                <th>Spend</th>
+                <th>ROAS</th>
+                <th>ROI</th>
+                <th>Orders</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-attr"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Revenue Share</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="ch-donut"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Clock Distribution & Timezone Compare -->
+    <div class="dash-row-2">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Order Time-of-Day Distribution</div>
+          <span class="chip" id="tz-chip-label">Store Timezone</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="ch-hourly"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Timezone Comparison <span
+              style="font-size:12px;font-weight:normal;color:var(--text-muted);margin-left:6px;">(Same order, two
+              clocks)</span></div>
+        </div>
+        <div class="table-wrapper" style="max-height: 240px; overflow-y: auto;">
+          <table class="tz-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Store Time</th>
+                <th>Creator Time</th>
+                <th>Offset</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-tz"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Daily Trend & Full Orders Log -->
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="panel-header">
+        <div class="panel-title">Daily Sales Attribution Timeline</div>
+      </div>
+      <div class="chart-container" style="height: 260px;">
+        <canvas id="ch-daily"></canvas>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">All Analyzed Orders Log</div>
+        <div class="filters-row">
+          <select id="fil-code" class="mini-select" onchange="filterOrders()">
+            <option value="">All Codes</option>
+          </select>
+          <select id="fil-tz" class="mini-select" onchange="filterOrders()">
+            <option value="store" selected>Show Store Time</option>
+            <option value="kol">Show Creator Time</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrapper" style="max-height: 400px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Timestamp</th>
+              <th>Items</th>
+              <th style="text-align:center">Qty</th>
+              <th>Code Used</th>
+              <th>Discount</th>
+              <th>Net Revenue</th>
+              <th>Attribution</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-orders"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast Element -->
+  <div class="toast" id="toast">
+    <span id="toast-msg">Notification text</span>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!-- CORE JAVASCRIPT LAYER -->
+  <!-- ════════════════════════════════════ -->
+  <script>
+    // ════════════════════════════════════
+    // STATE
+    // ════════════════════════════════════
+    let STATE = {
+      ordersRaw: null,
+      rosterRaw: null,
+      orders: [],
+      roster: [],
+      tzKol: 8,
+      tzStore: 8,
+      attrWindowHrs: 48,
+    };
+
+    // ════════════════════════════════════
+    // CSV PARSER
+    // ════════════════════════════════════
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const headers = splitCSVLine(lines[0]);
+      return lines.slice(1).filter(l => l.trim()).map(l => {
+        const vals = splitCSVLine(l);
+        const obj = {};
+        headers.forEach((h, i) => obj[h.trim()] = (vals[i] || '').trim());
+        return obj;
+      });
+    }
+    function splitCSVLine(line) {
+      const result = []; let cur = ''; let inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        if (line[i] === '"') { inQ = !inQ }
+        else if (line[i] === ',' && !inQ) { result.push(cur); cur = '' }
+        else cur += line[i];
+      }
+      result.push(cur); return result;
+    }
+
+    // ════════════════════════════════════
+    // FILE HANDLING
+    // ════════════════════════════════════
+    function handleDrag(e, id) { e.preventDefault(); document.getElementById(id).classList.add('dragover') }
+    function handleLeave(id) { document.getElementById(id).classList.remove('dragover') }
+    function handleDrop(e, type) {
+      e.preventDefault();
+      const id = type === 'orders' ? 'drop-orders' : 'drop-roster';
+      document.getElementById(id).classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) processFile(file, type);
+    }
+    function handleFile(e, type) { processFile(e.target.files[0], type) }
+    function processFile(file, type) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const parsed = parseCSV(e.target.result);
+        if (type === 'orders') {
+          STATE.ordersRaw = parsed;
+          const el = document.getElementById('drop-orders');
+          el.classList.add('done');
+          document.getElementById('orders-status').textContent = `✓ ${parsed.length} orders loaded`;
+        } else {
+          STATE.rosterRaw = parsed;
+          const el = document.getElementById('drop-roster');
+          el.classList.add('done');
+          document.getElementById('roster-status').textContent = `✓ ${parsed.length} creators loaded`;
+        }
+        checkReady();
+      };
+      reader.readAsText(file);
+    }
+    function checkReady() {
+      document.getElementById('btn-go').disabled = !(STATE.ordersRaw && STATE.rosterRaw);
+    }
+
+    // ════════════════════════════════════
+    // DEMO DATA GENERATOR
+    // ════════════════════════════════════
+    function loadDemoData() {
+      const SGT = 8;
+      function rng(s) { let x = Math.sin(s) * 10000; return x - Math.floor(x) }
+      const prods = [
+        ["Vitamin C Serum 30ml", 38], ["Hydra-Boost Moisturizer", 52], ["Glow Toner 200ml", 29]
+      ];
+      const creators = [
+        { name: "Jessica_Skincare", code: "JESS10", disc: 10, fee: 500 },
+        { name: "David_Glow", code: "DAVID15", disc: 15, fee: 300 },
+        { name: "Emma_Beauty", code: "EMMA20", disc: 20, fee: 800 },
+      ];
+      const codePool = [...creators.map(c => c.code), '', ''];
+      const base = new Date('2026-06-15T02:00:00Z');
+
+      STATE.ordersRaw = Array.from({ length: 12 }, (_, i) => {
+        const r1 = rng(i * 3 + 1), r3 = rng(i * 3 + 3);
+        const dtUTC = new Date(base.getTime() + (i * 3 * 3600 + i * 7 * 60) * 1000);
+        const dtSGT = new Date(dtUTC.getTime() + SGT * 3600000);
+        const code = codePool[i % codePool.length];
+        const c = creators.find(x => x.code === code);
+        const disc = c ? c.disc : 0;
+        const [prod, price] = prods[i % prods.length];
+        const qty = (i % 2) + 1;
+        const gross = price * qty;
+        const discAmt = parseFloat((gross * disc / 100).toFixed(2));
+        const net = parseFloat((gross - discAmt).toFixed(2));
+
+        const pad = n => String(n).padStart(2, '0');
+        const fmtDt = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:00 +0800`;
+        const fmtUTC = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:00 UTC`;
+
+        return {
+          'Name': `#ORD-${5001 + i}`,
+          'Created at': fmtDt(dtSGT),
+          'Created at (UTC)': fmtUTC(dtUTC),
+          'Lineitem name': prod,
+          'Lineitem quantity': String(qty),
+          'Lineitem price': String(price),
+          'Subtotal': String(gross),
+          'Discount Amount': String(discAmt),
+          'Discount Code': code,
+          'Shipping': '0',
+          'Total': String(net),
+          'Financial Status': 'paid',
+        };
+      });
+
+      // Insert duplicated order for deduplication test
+      const dupTimeUTC = new Date(base.getTime() + (36 * 3600) * 1000);
+      const dupTimeSGT = new Date(dupTimeUTC.getTime() + SGT * 3600000);
+      const pad = n => String(n).padStart(2, '0');
+      const fmtDt = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:00 +0800`;
+      const fmtUTC = d => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:00 UTC`;
+
+      STATE.ordersRaw.push({
+        'Name': '#ORD-5013', 'Created at': fmtDt(dupTimeSGT), 'Created at (UTC)': fmtUTC(dupTimeUTC),
+        'Lineitem name': 'Vitamin C Serum 30ml', 'Lineitem quantity': '1', 'Lineitem price': '38.0',
+        'Subtotal': '90.0', 'Discount Amount': '9.0', 'Discount Code': 'JESS10', 'Shipping': '0', 'Total': '81.0', 'Financial Status': 'paid'
+      });
+      STATE.ordersRaw.push({
+        'Name': '#ORD-5013', 'Created at': fmtDt(dupTimeSGT), 'Created at (UTC)': fmtUTC(dupTimeUTC),
+        'Lineitem name': 'Hydra-Boost Moisturizer', 'Lineitem quantity': '1', 'Lineitem price': '52.0',
+        'Subtotal': '90.0', 'Discount Amount': '9.0', 'Discount Code': 'JESS10', 'Shipping': '0', 'Total': '81.0', 'Financial Status': 'paid'
+      });
+
+      STATE.rosterRaw = creators.map(c => ({ Creator: c.name, Code: c.code, Flat_Fee: String(c.fee) }));
+
+      document.getElementById('drop-orders').classList.add('done');
+      document.getElementById('orders-status').textContent = `✓ 13 demo orders loaded`;
+      document.getElementById('drop-roster').classList.add('done');
+      document.getElementById('roster-status').textContent = `✓ 3 demo creators loaded`;
+      checkReady();
+      toast('Demo data loaded — click "Run Analysis" →');
+    }
+
+    // ════════════════════════════════════
+    // CORE ANALYSIS & TIMEZONE CORRECTION
+    // ════════════════════════════════════
+    function runAnalysis() {
+      STATE.tzKol = parseInt(document.getElementById('tz-kol').value);
+      STATE.tzStore = parseInt(document.getElementById('tz-store').value);
+      STATE.attrWindowHrs = parseInt(document.getElementById('attr-window').value) || 48;
+
+      STATE.roster = STATE.rosterRaw.map(r => ({
+        name: r['Creator'] || r['name'] || Object.values(r)[0],
+        code: (r['Code'] || r['code'] || Object.values(r)[1] || '').toUpperCase(),
+        fee: parseFloat(r['Flat_Fee'] || r['flat_fee'] || r['Fee'] || 0),
+      })).filter(r => r.code);
+
+      const codeMap = {};
+      STATE.roster.forEach(r => codeMap[r.code] = r);
+
+      const orderMap = {};
+
+      STATE.ordersRaw.forEach(row => {
+        const orderId = row['Name'] || row['order_id'] || row['订单号'];
+        if (!orderId) return;
+
+        const rawCode = (row['Discount Code'] || row['discount_code'] || '').trim().toUpperCase();
+        const net = parseFloat(row['Total'] || row['total'] || row['Net Revenue'] || 0);
+
+        if (!orderMap[orderId]) {
+          const rawDate = row['Created at'] || row['created_at'] || row['Date'] || '';
+          const rawUTC = row['Created at (UTC)'] || '';
+
+          let utcDate = null;
+          if (rawUTC) {
+            utcDate = parseShopifyDate(rawUTC, 0);
+          } else {
+            utcDate = parseShopifyDate(rawDate, STATE.tzStore);
+          }
+
+          const creator = codeMap[rawCode] || null;
+          const discAmt = parseFloat(row['Discount Amount'] || row['discount_amount'] || 0);
+
+          orderMap[orderId] = {
+            id: orderId,
+            utcDate: utcDate,
+            product: row['Lineitem name'] || row['lineitem_name'] || '—',
+            qty: parseInt(row['Lineitem quantity'] || row['qty'] || 1),
+            discAmt: discAmt,
+            net: net,
+            rawCode,
+            creator
+          };
+        } else {
+          orderMap[orderId].qty += parseInt(row['Lineitem quantity'] || row['qty'] || 0);
+          const nextProd = row['Lineitem name'] || row['lineitem_name'];
+          if (nextProd && !orderMap[orderId].product.includes(nextProd)) {
+            orderMap[orderId].product += `, ${nextProd}`;
+          }
+        }
+      });
+
+      STATE.orders = Object.values(orderMap).filter(o => o.net > 0);
+      buildDashboard();
+    }
+
+    function parseShopifyDate(str, tzOffsetHrs) {
+      if (!str) return null;
+      const clean = str.replace(/\s*\+\d{4}$/, '').replace(/\s*UTC$/, '').trim();
+      const d = new Date(clean.replace(' ', 'T') + 'Z');
+      if (isNaN(d)) return null;
+      return new Date(d.getTime() - tzOffsetHrs * 3600000);
+    }
+
+    function getLocalDetails(utcDate, offsetHrs) {
+      if (!utcDate) return { hour: 0, dateStr: '—', fullStr: '—' };
+      const localTime = new Date(utcDate.getTime() + offsetHrs * 3600000);
+      const pad = n => String(n).padStart(2, '0');
+      const y = localTime.getUTCFullYear();
+      const m = pad(localTime.getUTCMonth() + 1);
+      const d = pad(localTime.getUTCDate());
+      const hr = localTime.getUTCHours();
+      const min = pad(localTime.getUTCMinutes());
+      return {
+        hour: hr,
+        dateStr: `${y}-${m}-${d}`,
+        fullStr: `${y}-${m}-${d} ${pad(hr)}:${min}`
+      };
+    }
+
+    // ════════════════════════════════════
+    // DASHBOARD BUILDERS
+    // ════════════════════════════════════
+    const COLORS = ['#00FFB2', '#5B9CF6', '#FFB547', '#B47FFF', '#FF5C5C', '#34D399', '#F472B6', '#FBBF24'];
+
+    function buildDashboard() {
+      document.getElementById('screen-upload').style.display = 'none';
+      document.getElementById('screen-dash').style.display = 'block';
+      document.getElementById('dash-meta').style.display = 'flex';
+      document.getElementById('nav-action-zone').style.display = 'block';
+
+      const attributed = STATE.orders.filter(o => o.creator);
+      const organic = STATE.orders.filter(o => !o.creator);
+      const totalRev = attributed.reduce((s, o) => s + o.net, 0);
+      const totalSpend = STATE.roster.reduce((s, r) => s + r.fee, 0);
+      const roas = totalSpend > 0 ? totalRev / totalSpend : 0;
+      const roi = totalSpend > 0 ? (totalRev - totalSpend) / totalSpend * 100 : 0;
+
+      const dates = STATE.orders.map(o => o.utcDate).filter(Boolean).sort((a, b) => a - b);
+      if (dates.length) {
+        const start = getLocalDetails(dates[0], STATE.tzStore);
+        const end = getLocalDetails(dates[dates.length - 1], STATE.tzStore);
+        document.getElementById('meta-range').textContent = `${start.dateStr} → ${end.dateStr}`;
+      }
+      document.getElementById('meta-orders').textContent = `${STATE.orders.length} orders`;
+
+      animNum('k-rev', 0, totalRev, v => '$' + v.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+      animNum('k-ord', 0, attributed.length, v => Math.round(v));
+      animNum('k-spend', 0, totalSpend, v => '$' + v.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+      animNum('k-roas', 0, roas, v => v.toFixed(2) + 'x');
+      animNum('k-roi', 0, roi, v => Math.round(v) + '%');
+
+      const totalCombined = totalRev + organic.reduce((s, o) => s + o.net, 0);
+      document.getElementById('k-rev-s').textContent = `${totalCombined > 0 ? (totalRev / totalCombined * 100).toFixed(0) : '0'}% of total revenue`;
+      document.getElementById('k-ord-s').textContent = `${organic.length} organic orders`;
+      document.getElementById('k-spend-s').textContent = `${STATE.roster.length} creators`;
+      document.getElementById('k-roas-s').className = 'kpi-s ' + (roas >= 3 ? 'up' : roas >= 1.5 ? 'warn' : 'down');
+      document.getElementById('k-roas-s').textContent = roas >= 3 ? '✅ Healthy' : roas >= 1.5 ? '⚠️ Monitor' : '🔴 Needs work';
+      document.getElementById('k-roi-s').className = 'kpi-s ' + (roi >= 0 ? 'up' : 'down');
+      document.getElementById('k-roi-s').textContent = roi >= 0 ? 'Profitable' : 'Unprofitable';
+
+      const tzDiff = Math.abs(STATE.tzKol - STATE.tzStore);
+      if (tzDiff > 0) {
+        document.getElementById('tz-alert').style.display = 'flex';
+        document.getElementById('tz-alert-msg').textContent =
+          `Creator timezone UTC${STATE.tzKol >= 0 ? '+' : ''}${STATE.tzKol} is ${tzDiff}h off from the store timezone UTC+${STATE.tzStore}. ` +
+          `If a creator posts at 8pm LA time, the resulting orders land around noon the next day in Singapore — looking at raw admin data alone would misclassify them as "organic". ` +
+          `We've corrected for this automatically — see the timezone comparison table below for each order's two clock times.`;
+      } else {
+        document.getElementById('tz-alert').style.display = 'none';
+      }
+      document.getElementById('tz-chip-label').textContent = `UTC${STATE.tzStore >= 0 ? '+' : ''}${STATE.tzStore} store timezone`;
+
+      buildAttrTable();
+      buildTZTable();
+      buildOrdersTable();
+      buildCharts();
+    }
+
+    function creatorColor(idx) { return COLORS[idx % COLORS.length] }
+
+    function buildAttrTable() {
+      const tbody = document.getElementById('tbl-attr');
+      const rows = STATE.roster.map((r, i) => {
+        const orders = STATE.orders.filter(o => o.rawCode === r.code);
+        const rev = orders.reduce((s, o) => s + o.net, 0);
+        const roas = r.fee > 0 ? rev / r.fee : 0;
+        const roi = r.fee > 0 ? (rev - r.fee) / r.fee * 100 : 0;
+        const status = roas >= 3 ? 'b-g ✅ Strong' : roas >= 1.5 ? 'b-a ⚠️ Monitor' : 'b-r 🔴 Review';
+        const [bc, sl] = status.split(' ');
+        const c = creatorColor(i);
+        return `<tr>
+          <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:7px"></span>${r.name}</td>
+          <td><span class="badge b-b">${r.code}</span></td>
+          <td style="font-family:var(--font-mono);color:var(--accent)">$${rev.toFixed(0)}</td>
+          <td style="font-family:var(--font-mono)">$${r.fee}</td>
+          <td>
+            <div class="rb">
+              <div class="rb-track"><div class="rb-fill" style="width:${Math.min(100, roas / 6 * 100)}%;background:${c}"></div></div>
+              <span style="font-family:var(--font-mono);font-size:11px;white-space:nowrap">${roas.toFixed(2)}x</span>
+            </div>
+          </td>
+          <td style="font-family:var(--font-mono);color:${roi >= 0 ? 'var(--accent)' : 'var(--red)'}">${roi.toFixed(0)}%</td>
+          <td style="font-family:var(--font-mono)">${orders.length}</td>
+          <td><span class="badge ${bc}">${sl}</span></td>
+        </tr>`;
+      }).join('');
+      tbody.innerHTML = rows || '<tr><td colspan="8" class="empty">No matching data</td></tr>';
+    }
+
+    function buildTZTable() {
+      const sample = STATE.orders.filter(o => o.creator && o.utcDate).slice(0, 20);
+      const storeTzText = `Store Time (UTC${STATE.tzStore >= 0 ? '+' : ''}${STATE.tzStore})`;
+      const kolTzText = `Creator Time (UTC${STATE.tzKol >= 0 ? '+' : ''}${STATE.tzKol})`;
+
+      const thead = document.querySelector('.tz-table thead tr');
+      if (thead) {
+        thead.innerHTML = `<th>Order ID</th><th>${storeTzText}</th><th>${kolTzText}</th><th>Offset</th>`;
+      }
+
+      const offsetDiff = STATE.tzKol - STATE.tzStore;
+
+      document.getElementById('tbl-tz').innerHTML = sample.map(o => {
+        const storeDetails = getLocalDetails(o.utcDate, STATE.tzStore);
+        const kolDetails = getLocalDetails(o.utcDate, STATE.tzKol);
+        return `<tr>
+          <td style="color:var(--muted2)">${o.id}</td>
+          <td>${storeDetails.fullStr}</td>
+          <td>${kolDetails.fullStr}</td>
+          <td class="tz-diff">${offsetDiff > 0 ? '+' : ''}${offsetDiff}h</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function buildOrdersTable() {
+      const sel = document.getElementById('fil-code');
+      if (sel.options.length <= 1) {
+        STATE.roster.forEach(r => { const o = document.createElement('option'); o.value = r.code; o.textContent = r.code; sel.appendChild(o); });
+      }
+      filterOrders();
+    }
+
+    function filterOrders() {
+      const code = document.getElementById('fil-code').value;
+      const tzMode = document.getElementById('fil-tz').value;
+      const rows = (code ? STATE.orders.filter(o => o.rawCode === code) : STATE.orders).slice().reverse();
+
+      document.getElementById('tbl-orders').innerHTML = rows.map(o => {
+        const currentOffset = tzMode === 'kol' ? STATE.tzKol : STATE.tzStore;
+        const details = getLocalDetails(o.utcDate, currentOffset);
+        const codeBadge = o.creator ? `<span class="badge b-b">${o.rawCode}</span>` : `<span class="badge b-n">${o.rawCode || '—'}</span>`;
+        return `<tr>
+          <td style="font-family:var(--font-mono);color:var(--muted2)">${o.id}</td>
+          <td style="font-family:var(--font-mono);font-size:11px">${details.fullStr}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.product}</td>
+          <td style="text-align:center">${o.qty}</td>
+          <td>${codeBadge}</td>
+          <td style="font-family:var(--font-mono);color:var(--red)">-$${o.discAmt.toFixed(2)}</td>
+          <td style="font-family:var(--font-mono);color:var(--accent)">$${o.net.toFixed(2)}</td>
+          <td style="font-size:12px;color:var(--muted2)">${o.creator ? o.creator.name : '(organic)'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    let chartInstances = {};
+    function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
+
+    function buildCharts() {
+      const CHART_DEFAULTS = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#8B93A7', font: { size: 11 }, boxWidth: 10, padding: 14 } } },
+      };
+
+      // Donut Chart
+      destroyChart('ch-donut');
+      const creatorRevs = STATE.roster.map((r, i) => ({
+        label: r.name.split('_')[0],
+        rev: STATE.orders.filter(o => o.rawCode === r.code).reduce((s, o) => s + o.net, 0),
+        color: creatorColor(i),
+      }));
+      const organic = STATE.orders.filter(o => !o.creator).reduce((s, o) => s + o.net, 0);
+      if (organic > 0) creatorRevs.push({ label: 'Organic', rev: organic, color: '#374151' });
+
+      chartInstances['ch-donut'] = new Chart(document.getElementById('ch-donut'), {
+        type: 'doughnut',
+        data: {
+          labels: creatorRevs.map(c => c.label),
+          datasets: [{
+            data: creatorRevs.map(c => c.rev.toFixed(0)),
+            backgroundColor: creatorRevs.map(c => c.color + 'CC'),
+            borderColor: '#0D0F16', borderWidth: 3, hoverOffset: 6
+          }]
+        },
+        options: {
+          ...CHART_DEFAULTS, cutout: '62%',
+          plugins: {
+            ...CHART_DEFAULTS.plugins,
+            tooltip: { callbacks: { label: ctx => ' $' + parseFloat(ctx.parsed).toFixed(0) + ' (' + ctx.label + ')' } }
+          }
+        }
+      });
+
+      // Hourly distribution
+      destroyChart('ch-hourly');
+      const hourCounts = Array(24).fill(0);
+      STATE.orders.filter(o => o.utcDate).forEach(o => {
+        const storeDetails = getLocalDetails(o.utcDate, STATE.tzStore);
+        hourCounts[storeDetails.hour]++;
+      });
+
+      chartInstances['ch-hourly'] = new Chart(document.getElementById('ch-hourly'), {
+        type: 'bar',
+        data: {
+          labels: Array.from({ length: 24 }, (_, i) => i + ':00'),
+          datasets: [{ data: hourCounts, backgroundColor: hourCounts.map(v => `rgba(0,255,178,${0.1 + v / Math.max(...hourCounts) * 0.7})`), borderColor: 'rgba(0,255,178,0.4)', borderWidth: 1, borderRadius: 3 }]
+        },
+        options: {
+          ...CHART_DEFAULTS, plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#5A6173', font: { size: 10 }, maxTicksLimit: 8 } },
+            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5A6173', font: { size: 10 }, stepSize: 1 } }
+          }
+        }
+      });
+
+      // Daily trend
+      destroyChart('ch-daily');
+      const dayMap = {};
+      STATE.orders.forEach(o => {
+        if (!o.utcDate) return;
+        const storeDetails = getLocalDetails(o.utcDate, STATE.tzStore);
+        const k = storeDetails.dateStr;
+        if (!dayMap[k]) dayMap[k] = { attr: 0, organic: 0 };
+        if (o.creator) dayMap[k].attr += o.net; else dayMap[k].organic += o.net;
+      });
+      const days = Object.keys(dayMap).sort();
+
+      chartInstances['ch-daily'] = new Chart(document.getElementById('ch-daily'), {
+        type: 'bar',
+        data: {
+          labels: days.map(d => d.slice(5)),
+          datasets: [
+            { label: 'Attributed Revenue', data: days.map(d => dayMap[d].attr.toFixed(0)), backgroundColor: 'rgba(0,255,178,0.25)', borderColor: '#00FFB2', borderWidth: 1.5, borderRadius: 4, stack: 's' },
+            { label: 'Organic', data: days.map(d => dayMap[d].organic.toFixed(0)), backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.15)', borderWidth: 1, borderRadius: 4, stack: 's' },
+          ]
+        },
+        options: {
+          ...CHART_DEFAULTS,
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#5A6173', font: { size: 10 }, maxTicksLimit: 12 } },
+            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5A6173', font: { size: 10 }, callback: v => '$' + v } }
+          }
+        }
+      });
+    }
+
+    // ════════════════════════════════════
+    // UTILS
+    // ════════════════════════════════════
+    function animNum(id, from, to, fmt) {
+      const el = document.getElementById(id); if (!el) return;
+      let i = 0; const steps = 35;
+      const iv = setInterval(() => {
+        i++; el.textContent = fmt(from + (to - from) * (i / steps));
+        if (i >= steps) { clearInterval(iv); el.textContent = fmt(to); }
+      }, 600 / steps);
+    }
+
+    let toastTimer;
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function resetToUpload() {
+      STATE = { ordersRaw: null, rosterRaw: null, orders: [], roster: [], tzKol: 8, tzStore: 8, attrWindowHrs: 48 };
+      ['drop-orders', 'drop-roster'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('done', 'dragover');
+      });
+      document.getElementById('orders-status').textContent = '✓ Loaded';
+      document.getElementById('roster-status').textContent = '✓ Loaded';
+      document.getElementById('btn-go').disabled = true;
+      document.getElementById('screen-upload').style.display = 'flex';
+      document.getElementById('screen-dash').style.display = 'none';
+      document.getElementById('dash-meta').style.display = 'none';
+      document.getElementById('nav-action-zone').style.display = 'none';
+      ['ch-donut', 'ch-hourly', 'ch-daily'].forEach(destroyChart);
+    }
+  </script>
+</body>
+
+</html>
